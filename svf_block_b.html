@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Investment Study B</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { touch-action: manipulation; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; line-height: 1.6; -webkit-text-size-adjust: 100%; }
+.container { max-width: 800px; margin: 0 auto; padding: 20px; }
+.card { background: white; border-radius: 12px; padding: 30px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { color: #1a365d; font-size: 24px; margin-bottom: 10px; }
+h2 { color: #2d3748; font-size: 20px; margin-bottom: 15px; }
+p { color: #4a5568; margin-bottom: 15px; }
+.highlight { background: #ebf8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #3182ce; margin: 15px 0; }
+.highlight-red { background: #fff5f5; border-color: #e53e3e; }
+.highlight-green { background: #f0fff4; border-color: #48bb78; }
+.btn { background: #3182ce; color: white; border: none; padding: 14px 30px; border-radius: 8px; font-size: 16px; cursor: pointer; -webkit-appearance: none; touch-action: manipulation; }
+.btn:active { background: #2c5aa0; }
+.btn:disabled { background: #a0aec0; cursor: not-allowed; }
+.btn-secondary { background: #718096; }
+.progress-bar { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 20px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #3182ce, #63b3ed); border-radius: 4px; transition: width 0.3s; }
+.progress-text { text-align: center; color: #718096; font-size: 14px; margin-bottom: 10px; }
+.chart-container { background: #f8fafc; border-radius: 8px; padding: 25px 30px; margin: 20px 0; }
+.chart-title { text-align: center; font-weight: bold; color: #2d3748; margin-bottom: 20px; font-size: 16px; }
+.chart-area { position: relative; height: 320px; margin: 0 auto; max-width: 400px; }
+.chart-x-axis { position: absolute; left: 40px; right: 20px; top: 50%; height: 2px; background: #2d3748; transform: translateY(-50%); }
+.chart-zero-label { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #2d3748; font-weight: bold; }
+.chart-bars { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; justify-content: center; gap: 50px; }
+.bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 80px; height: 100%; position: relative; }
+.bar-area-top { height: 50%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.bar-area-bottom { height: 50%; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; }
+.bar { width: 60px; border-radius: 4px; position: relative; min-height: 2px; }
+.bar.positive { background: linear-gradient(to top, #38a169, #68d391); border-radius: 4px 4px 0 0; }
+.bar.negative { background: linear-gradient(to bottom, #e53e3e, #fc8181); border-radius: 0 0 4px 4px; }
+.bar-value { position: absolute; left: 50%; transform: translateX(-50%); font-weight: bold; font-size: 14px; white-space: nowrap; }
+.bar.positive .bar-value { top: -25px; color: #276749; }
+.bar.negative .bar-value { top: 5px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.bar.negative.short-bar .bar-value { top: auto; bottom: -25px; color: #c53030; text-shadow: none; }
+.bar-label { position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #2d3748; font-weight: 600; white-space: nowrap; text-align: center; }
+.bar-wrapper.others .bar-label { transform: translateX(-50%) translateX(10px); }
+.bar-wrapper.others { opacity: 0; transition: opacity 0.5s ease; }
+.bar-wrapper.others.visible { opacity: 1; }
+.chart-legend { display: flex; justify-content: center; gap: 30px; margin-top: 15px; font-size: 13px; color: #4a5568; }
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-box { width: 16px; height: 16px; border-radius: 3px; }
+.legend-box.gain { background: #38a169; }
+.legend-box.loss { background: #e53e3e; }
+.scale-container { margin: 20px 0; }
+.scale-labels { display: flex; justify-content: space-between; font-size: 13px; color: #1a202c; margin-bottom: 8px; font-weight: 600; }
+.scale-options { display: flex; justify-content: space-between; gap: 2px; }
+.scale-option, .likert-option, .checkbox-container, .radio-option, .change-option { cursor: pointer; -webkit-tap-highlight-color: rgba(0,0,0,0.05); -webkit-user-select: none; user-select: none; }
+.scale-option { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 2px; border-radius: 6px; border: 2px solid transparent; touch-action: manipulation; }
+.scale-option:active { background: #bee3f8; }
+.scale-option.selected { background: #bee3f8; border-color: #3182ce; }
+.scale-circle { width: 32px; height: 32px; border: 2px solid #a0aec0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; color: #4a5568; }
+.scale-option.selected .scale-circle { border-color: #3182ce; background: #3182ce; color: white; }
+.likert { display: flex; justify-content: space-between; margin: 15px 0; gap: 4px; }
+.likert-option { display: flex; flex-direction: column; align-items: center; padding: 10px 4px; border-radius: 8px; flex: 1; border: 2px solid transparent; touch-action: manipulation; }
+.likert-option:active { background: #bee3f8; }
+.likert-option.selected { background: #bee3f8; border-color: #3182ce; }
+.likert-radio { width: 28px; height: 28px; border: 2px solid #a0aec0; border-radius: 50%; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; }
+.likert-option.selected .likert-radio { border-color: #3182ce; background: #3182ce; }
+.likert-option.selected .likert-radio::after { content: '✓'; color: white; font-size: 14px; }
+.likert-number { font-weight: bold; color: #4a5568; font-size: 14px; }
+.likert-anchors { display: flex; justify-content: space-between; font-size: 14px; color: #1a202c; margin-top: 8px; font-weight: 700; }
+.likert-wrapper { position: relative; }
+.likert-center-label { text-align: center; font-size: 12px; color: #718096; margin-top: -5px; margin-bottom: 5px; }
+.change-scale { display: flex; justify-content: space-between; margin: 15px 0; gap: 3px; }
+.change-option { display: flex; flex-direction: column; align-items: center; padding: 10px 6px; border-radius: 8px; flex: 1; border: 2px solid transparent; touch-action: manipulation; }
+.change-option:active { background: #bee3f8; }
+.change-option.selected { background: #bee3f8; border-color: #3182ce; }
+.change-option.selected .change-circle { border-color: #3182ce; background: #3182ce; color: white; }
+.change-circle { width: 28px; height: 28px; border: 2px solid #a0aec0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; color: #4a5568; }
+.question-box { background: #f7fafc; border-radius: 8px; padding: 20px; margin: 20px 0; }
+.question-text { font-weight: bold; color: #2d3748; margin-bottom: 15px; font-size: 15px; }
+.hidden { display: none !important; }
+.nav-buttons { display: flex; justify-content: flex-end; gap: 15px; margin-top: 25px; }
+.scenario-info { background: #edf2f7; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+.scenario-number { font-size: 16px; color: #2d3748; font-weight: 600; }
+.checkbox-container { display: flex; align-items: flex-start; gap: 10px; margin: 15px 0; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; touch-action: manipulation; }
+.checkbox-container:active { background: #f7fafc; }
+.checkbox-container.selected { background: #ebf8ff; border-color: #3182ce; }
+.checkbox { width: 24px; height: 24px; border: 2px solid #a0aec0; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.checkbox-container.selected .checkbox { background: #3182ce; border-color: #3182ce; }
+.checkbox-container.selected .checkbox::after { content: '✓'; color: white; font-size: 16px; font-weight: bold; }
+.radio-group { margin-top: 10px; }
+.radio-option { display: flex; align-items: center; gap: 10px; padding: 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 8px; touch-action: manipulation; }
+.radio-option:active { background: #f0f4f8; }
+.radio-option.selected { background: #ebf8ff; border-color: #3182ce; }
+.radio-circle { width: 22px; height: 22px; border: 2px solid #a0aec0; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.radio-option.selected .radio-circle { border-color: #3182ce; }
+.radio-option.selected .radio-circle::after { content: ''; width: 12px; height: 12px; background: #3182ce; border-radius: 50%; }
+input[type="number"], select { width: 100%; padding: 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 16px; margin-top: 5px; -webkit-appearance: none; background: white; }
+input:focus, select:focus { outline: none; border-color: #3182ce; }
+.form-group { margin-bottom: 20px; }
+.form-label { font-weight: bold; color: #4a5568; display: block; margin-bottom: 5px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.incom-item { padding: 15px; background: #f7fafc; border-radius: 8px; margin-bottom: 15px; }
+.incom-text { font-size: 14px; color: #4a5568; margin-bottom: 10px; }
+.error-message { color: #e53e3e; font-size: 13px; margin-top: 5px; display: none; }
+.error-message.show { display: block; }
+@media (max-width: 600px) {
+.container { padding: 12px; }
+.card { padding: 20px; }
+.scale-labels { font-size: 11px; }
+.scale-circle { width: 28px; height: 28px; font-size: 11px; }
+.scale-option { padding: 6px 1px; }
+.likert-radio { width: 26px; height: 26px; }
+.likert-number { font-size: 13px; }
+.likert-anchors { font-size: 12px; }
+.bar { width: 50px; }
+.bar-wrapper { width: 100px; }
+.bar-value { font-size: 12px; }
+.bar-label { font-size: 9px; }
+.form-row { grid-template-columns: 1fr; }
+.chart-area { height: 300px; }
+h1 { font-size: 20px; }
+h2 { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div id="intro" class="card">
+<h1>📊 Investment Performance Evaluation Study</h1>
+<p>Thank you for participating in this research study about how people evaluate investment outcomes.</p>
+<div class="highlight"><strong>📋 Study Overview</strong><br>• You will see various hypothetical investment scenarios<br>• Please respond honestly based on how you would feel<br>• There are no right or wrong answers<br>• Estimated time: 15-20 minutes</div>
+<div class="highlight highlight-red"><strong>📌 Important Setup</strong><br><br>Imagine you occasionally discuss investments with <strong>acquaintances</strong> who started investing around the same time as you.<br>(e.g., coworkers, friends from college, people from investment communities, etc.)<br><br>Throughout this survey, <strong>"Acquaintances"</strong> refers to the average returns of these acquaintances.</div>
+<div class="question-box">
+<div class="question-text">Who do you typically compare your investment performance with? (Select all that apply)</div>
+<div class="checkbox-container" id="compare-coworkers"><div class="checkbox"></div><span>Coworkers or colleagues</span></div>
+<div class="checkbox-container" id="compare-friends"><div class="checkbox"></div><span>Friends of similar age</span></div>
+<div class="checkbox-container" id="compare-community"><div class="checkbox"></div><span>Investment community members</span></div>
+<div class="checkbox-container" id="compare-social"><div class="checkbox"></div><span>People I follow on social media</span></div>
+<div class="error-message" id="compare-error">Please select at least one option.</div>
+</div>
+<div class="checkbox-container" id="consent-check"><div class="checkbox"></div><span>I understand the above information and agree to participate in this study.</span></div>
+<div class="nav-buttons"><button class="btn" id="start-btn" disabled>Start</button></div>
+</div>
+<div id="practice" class="card hidden">
+<h2>📝 Practice Question</h2>
+<p>Before we begin, let's make sure you understand how to read the charts.</p>
+<div class="chart-container"><div class="chart-title">📈 Investment Returns Over the Past Year</div><div class="chart-area"><div class="chart-zero-label">0%</div><div class="chart-x-axis"></div><div class="chart-bars">
+<div class="bar-wrapper"><div class="bar-area-top"><div class="bar positive" style="height: 35px;"><div class="bar-value">+15%</div></div></div><div class="bar-area-bottom"></div><div class="bar-label">Your Return</div></div>
+<div class="bar-wrapper others visible"><div class="bar-area-top"><div class="bar positive" style="height: 58px;"><div class="bar-value">+25%</div></div></div><div class="bar-area-bottom"></div><div class="bar-label">Acquaintances</div></div>
+</div></div><div class="chart-legend"><div class="legend-item"><div class="legend-box gain"></div>Gain</div><div class="legend-item"><div class="legend-box loss"></div>Loss</div></div></div>
+<div class="highlight">• The <strong>horizontal line represents 0%</strong> (break-even)<br>• Gains are shown above the line, losses below<br>• Example above: Your return +15%, Acquaintances +25%</div>
+<div class="nav-buttons"><button class="btn" id="btn-practice-next">Next</button></div>
+</div>
+<div id="instructions" class="card hidden">
+<h2>📋 Before We Begin</h2>
+<div class="highlight"><strong>🎯 Scenario Setup</strong><br><br>• Investment amount: <strong>$100,000</strong><br>• Investment type: Domestic equity fund<br>• Investment period: <strong>1 year</strong><br>• Comparison group: Acquaintances who invested around the same time</div>
+<p>You will see <strong>15</strong> different investment scenarios.</p>
+<div class="highlight highlight-green"><strong>💡 How to Respond</strong><br><br>• Please respond <strong>intuitively</strong> based on how you would feel<br>• Don't overthink – your first reaction is what matters</div>
+<div class="nav-buttons"><button class="btn" id="btn-start-main">Begin Survey</button></div>
+</div>
+<div id="main-phase1" class="card hidden">
+<div class="progress-text" id="progress-text-1">1 / 15</div>
+<div class="progress-bar"><div class="progress-fill" id="progress-fill-1" style="width: 6.7%;"></div></div>
+<div class="scenario-info"><div class="scenario-number">Scenario <span id="scenario-num-1">1</span> / 15</div></div>
+<div class="chart-container" id="chart-phase1"></div>
+<div class="question-box"><div class="question-text">Q1. Overall, how good or bad do you feel about this investment outcome?</div><div class="scale-container"><div class="scale-labels"><span>Very Bad</span><span>Neutral</span><span>Very Good</span></div><div class="scale-options" id="q1a-scale"></div></div><div class="error-message" id="q1a-error">Please select a response.</div></div>
+<div class="nav-buttons"><button class="btn" id="next-phase1">Next</button></div>
+</div>
+<div id="main-phase2" class="card hidden">
+<div class="progress-text" id="progress-text-2">1 / 15</div>
+<div class="progress-bar"><div class="progress-fill" id="progress-fill-2" style="width: 6.7%;"></div></div>
+<div class="scenario-info"><div class="scenario-number">Scenario <span id="scenario-num-2">1</span> / 15</div></div>
+<div class="chart-container" id="chart-phase2"></div>
+<div class="question-box"><div class="question-text">Q2. Now that you see how your acquaintances did, how good or bad do you feel about this investment outcome?</div><div class="scale-container"><div class="scale-labels"><span>Very Bad</span><span>Neutral</span><span>Very Good</span></div><div class="scale-options" id="q1b-scale"></div></div><div class="error-message" id="q1b-error">Please select a response.</div></div>
+<div id="change-question-box" class="question-box hidden"><div class="question-text">Q3. Compared to before you learned about your acquaintances' results, how has your feeling changed?</div><div class="scale-container"><div class="scale-labels"><span>Much Worse</span><span>No Change</span><span>Much Better</span></div><div class="change-scale" id="q-change-scale"></div></div><div class="error-message" id="q-change-error">Please select a response.</div></div>
+<div id="relative-loss-questions" class="hidden">
+<div class="question-box"><div class="question-text" id="q-deprivation-text">Q3. Do you feel like you've fallen behind compared to your acquaintances?</div><div class="likert-wrapper"><div class="likert" id="q-deprivation"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Not at all</span><span>Very much</span></div></div><div class="error-message" id="q-deprivation-error">Please select a response.</div></div>
+<div class="question-box"><div class="question-text" id="q-envy-text">Q4. Do you feel envious of your acquaintances?</div><div class="likert-wrapper"><div class="likert" id="q-envy"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Not at all</span><span>Very much</span></div></div><div class="error-message" id="q-envy-error">Please select a response.</div></div>
+</div>
+<div id="relative-gain-questions" class="hidden">
+<div class="question-box"><div class="question-text" id="q-superiority-text">Q3. Do you feel a sense of superiority compared to your acquaintances?</div><div class="likert-wrapper"><div class="likert" id="q-superiority"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Not at all</span><span>Very much</span></div></div><div class="error-message" id="q-superiority-error">Please select a response.</div></div>
+</div>
+<div id="relief-questions" class="hidden">
+<div class="question-box"><div class="question-text" id="q-relief-text">Q4. Do you feel relieved that at least you didn't do worse than your acquaintances?</div><div class="likert-wrapper"><div class="likert" id="q-relief"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Not at all</span><span>Very much</span></div></div><div class="error-message" id="q-relief-error">Please select a response.</div></div>
+</div>
+<div class="nav-buttons"><button class="btn" id="next-phase2">Next</button></div>
+</div>
+<div id="manipulation-check" class="card hidden">
+<h2>📋 Additional Questions</h2>
+<div class="question-box"><div class="question-text">1. When you learned about your acquaintances' results, did your satisfaction change?</div><div class="likert-wrapper"><div class="likert" id="mc1-likert"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Did not change at all</span><span>Changed significantly</span></div></div><div class="error-message" id="mc1-error">Please select a response.</div></div>
+<div class="question-box"><div class="question-text">2. When responding, did you consciously consider the difference between your return and your acquaintances' average?</div><div class="likert-wrapper"><div class="likert" id="mc2-likert"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Not at all</span><span>Very much</span></div></div><div class="error-message" id="mc2-error">Please select a response.</div></div>
+<div class="question-box"><div class="question-text">3. In which situation did you most want to switch to a different fund?</div><div class="radio-group" id="mc3-group"><div class="radio-option" data-value="1"><div class="radio-circle"></div><span>When I gained but acquaintances gained more</span></div><div class="radio-option" data-value="2"><div class="radio-circle"></div><span>When I lost while acquaintances gained</span></div><div class="radio-option" data-value="3"><div class="radio-circle"></div><span>When both lost but I lost more</span></div><div class="radio-option" data-value="4"><div class="radio-circle"></div><span>I didn't particularly want to switch funds</span></div></div><div class="error-message" id="mc3-error">Please select a response.</div></div>
+<div class="question-box"><div class="question-text">4. In which situation did you most want to stop investing altogether?</div><div class="radio-group" id="mc4-group"><div class="radio-option" data-value="1"><div class="radio-circle"></div><span>When I gained but acquaintances gained more</span></div><div class="radio-option" data-value="2"><div class="radio-circle"></div><span>When I lost while acquaintances gained</span></div><div class="radio-option" data-value="3"><div class="radio-circle"></div><span>When both lost but I lost more</span></div><div class="radio-option" data-value="4"><div class="radio-circle"></div><span>I didn't particularly want to stop investing</span></div></div><div class="error-message" id="mc4-error">Please select a response.</div></div>
+<div class="nav-buttons"><button class="btn" id="btn-mc-next">Next</button></div>
+</div>
+<div id="social-comparison" class="card hidden">
+<h2>📋 Questions About Your Tendencies</h2>
+<p style="margin-bottom: 20px;">Please indicate how much each statement describes you.</p>
+<div class="incom-item"><div class="incom-text">1. I often compare how I am doing socially (e.g., social skills, popularity) with other people.</div><div class="likert-wrapper"><div class="likert" id="incom1"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Strongly Disagree</span><span>Strongly Agree</span></div></div><div class="error-message" id="incom1-error">Please select a response.</div></div>
+<div class="incom-item"><div class="incom-text">2. I always pay attention to how I do things compared with how others do things.</div><div class="likert-wrapper"><div class="likert" id="incom2"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Strongly Disagree</span><span>Strongly Agree</span></div></div><div class="error-message" id="incom2-error">Please select a response.</div></div>
+<div class="incom-item"><div class="incom-text">3. I often compare myself with others with respect to what I have accomplished in life.</div><div class="likert-wrapper"><div class="likert" id="incom3"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Strongly Disagree</span><span>Strongly Agree</span></div></div><div class="error-message" id="incom3-error">Please select a response.</div></div>
+<div class="incom-item"><div class="incom-text">4. If I want to find out how well I have done something, I compare what I have done with how others have done.</div><div class="likert-wrapper"><div class="likert" id="incom4"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Strongly Disagree</span><span>Strongly Agree</span></div></div><div class="error-message" id="incom4-error">Please select a response.</div></div>
+<div class="incom-item"><div class="incom-text">5. I often like to talk with others about mutual opinions and experiences.</div><div class="likert-wrapper"><div class="likert" id="incom5"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Strongly Disagree</span><span>Strongly Agree</span></div></div><div class="error-message" id="incom5-error">Please select a response.</div></div>
+<div class="incom-item"><div class="incom-text">6. I often try to find out what others think who face similar problems as I face.</div><div class="likert-wrapper"><div class="likert" id="incom6"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Strongly Disagree</span><span>Strongly Agree</span></div></div><div class="error-message" id="incom6-error">Please select a response.</div></div>
+<div class="nav-buttons"><button class="btn" id="btn-sc-next">Next</button></div>
+</div>
+<div id="demographics" class="card hidden">
+<h2>📋 Background Information</h2>
+<div class="form-row"><div class="form-group"><label class="form-label">Gender</label><select id="demo-gender"><option value="">Select</option><option value="M">Male</option><option value="F">Female</option><option value="NB">Non-binary</option><option value="O">Prefer not to say</option></select><div class="error-message" id="gender-error">Please select.</div></div><div class="form-group"><label class="form-label">Age</label><input type="number" id="demo-age" placeholder="e.g., 35" min="18" max="100"><div class="error-message" id="age-error">Please enter your age.</div></div></div>
+<div class="form-group"><label class="form-label">Investment Experience</label><select id="demo-invest-exp"><option value="">Select</option><option value="0">None</option><option value="1">Less than 1 year</option><option value="2">1-3 years</option><option value="3">3-5 years</option><option value="4">5-10 years</option><option value="5">More than 10 years</option></select><div class="error-message" id="invest-exp-error">Please select.</div></div>
+<div class="form-group"><label class="form-label">What do you currently invest in? (Select all that apply)</label><div style="margin-top: 10px;" id="invest-options"><div class="checkbox-container" data-value="savings"><div class="checkbox"></div><span>Savings/CDs</span></div><div class="checkbox-container" data-value="stock"><div class="checkbox"></div><span>Individual Stocks</span></div><div class="checkbox-container" data-value="etf"><div class="checkbox"></div><span>ETFs/Index Funds</span></div><div class="checkbox-container" data-value="mutual"><div class="checkbox"></div><span>Mutual Funds</span></div><div class="checkbox-container" data-value="crypto"><div class="checkbox"></div><span>Cryptocurrency</span></div><div class="checkbox-container" data-value="realestate"><div class="checkbox"></div><span>Real Estate</span></div><div class="checkbox-container" data-value="none"><div class="checkbox"></div><span>None</span></div></div><div class="error-message" id="invest-products-error">Please select at least one option.</div></div>
+<div class="form-group"><label class="form-label">How often do you check investment communities or forums?</label><select id="demo-community"><option value="">Select</option><option value="1">Never</option><option value="2">Rarely (a few times a year)</option><option value="3">Sometimes (monthly)</option><option value="4">Often (weekly)</option><option value="5">Very often (daily)</option></select><div class="error-message" id="community-error">Please select.</div></div>
+<div class="question-box"><div class="question-text">Which statement best describes you?</div><div class="likert-wrapper"><div class="likert" id="risk1"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>I avoid risks</span><span>I seek risks</span></div></div><div class="error-message" id="risk1-error">Please select a response.</div></div>
+<div class="question-box"><div class="question-text">When it comes to investments, I prefer:</div><div class="likert-wrapper"><div class="likert" id="risk2"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Stable, low returns</span><span>Volatile, high returns</span></div></div><div class="error-message" id="risk2-error">Please select a response.</div></div>
+<div class="nav-buttons"><button class="btn" id="btn-submit">Submit</button></div>
+</div>
+<div id="complete" class="card hidden">
+<h2>✅ Thank You!</h2>
+<p>Your responses have been recorded successfully.</p>
+<div class="highlight highlight-green"><strong>🎉 Survey Complete</strong><br><br>Thank you for participating in this study about investment performance evaluation.</div>
+<p>Please click the button below to complete your submission and receive credit:</p>
+<div class="nav-buttons" style="justify-content: center; flex-direction: column; align-items: center; gap: 20px;">
+<a href="#" class="btn" id="prolific-return-btn">Complete & Return to Prolific</a>
+<button class="btn btn-secondary" id="btn-download">Download My Data (Optional)</button>
+</div>
+</div>
+</div>
+<script>
+var BLOCK = 'B';
+var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby6VdP_zhZYisXMPJ7k1DE8DgBIj8QymLwrGK1BuDl18l5x6MJlIPjGmS8ysDPcGzm-cQ/exec'; // 여기에 주소를 넣으세요!
+var PROLIFIC_COMPLETION_CODE = 'BLOCK_B_CODE'; // 나중에 프롤리픽 코드로 바꾸세요
+
+function getUrlParameter(name) { var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'); var results = regex.exec(location.search); return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' ')); }
+var PROLIFIC_PID = getUrlParameter('PROLIFIC_PID');
+var SESSION_ID = getUrlParameter('SESSION_ID');
+var STUDY_ID = getUrlParameter('STUDY_ID');
+
+var scenarios = [
+{id:2, ri:32, dr:10, myReturn:32, othersReturn:22, condition:'relative_gain'},
+{id:4, ri:32, dr:-10, myReturn:32, othersReturn:42, condition:'relative_loss'},
+{id:6, ri:16, dr:20, myReturn:16, othersReturn:-4, condition:'relative_gain'},
+{id:8, ri:16, dr:0, myReturn:16, othersReturn:16, condition:'equal'},
+{id:10, ri:16, dr:-20, myReturn:16, othersReturn:36, condition:'relative_loss'},
+{id:12, ri:6, dr:10, myReturn:6, othersReturn:-4, condition:'relative_gain'},
+{id:14, ri:6, dr:-10, myReturn:6, othersReturn:16, condition:'relative_loss'},
+{id:16, ri:-6, dr:20, myReturn:-6, othersReturn:-26, condition:'relative_gain'},
+{id:18, ri:-6, dr:0, myReturn:-6, othersReturn:-6, condition:'equal'},
+{id:20, ri:-6, dr:-20, myReturn:-6, othersReturn:14, condition:'relative_loss'},
+{id:22, ri:-16, dr:10, myReturn:-16, othersReturn:-26, condition:'relative_gain'},
+{id:24, ri:-16, dr:-10, myReturn:-16, othersReturn:-6, condition:'relative_loss'},
+{id:26, ri:-32, dr:20, myReturn:-32, othersReturn:-52, condition:'relative_gain'},
+{id:28, ri:-32, dr:0, myReturn:-32, othersReturn:-32, condition:'equal'},
+{id:30, ri:-32, dr:-20, myReturn:-32, othersReturn:-12, condition:'relative_loss'}
+];
+var changePerceptionIds = [2, 6, 24, 30];
+var TOTAL_SCENARIOS = 15;
+var shuffledScenarios = [], currentScenario = 0, responses = [];
+var mcData = {mc1:null, mc2:null, mc3:null, mc4:null}, incomData = {}, riskData = {r1:null, r2:null};
+var investProducts = [], compareTargets = [];
+function shuffleArray(arr) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+document.addEventListener('DOMContentLoaded', function() { initAllScales(); bindAllEvents(); });
+function bindAllEvents() {
+    document.querySelectorAll('#intro .checkbox-container[id^="compare-"]').forEach(function(b) { b.addEventListener('click', function(e) { toggleCompare(this.id.replace('compare-', '')); }); });
+    document.getElementById('consent-check').addEventListener('click', function(e) { toggleConsent(); });
+    document.getElementById('start-btn').addEventListener('click', function(e) { startSurvey(); });
+    document.getElementById('btn-practice-next').addEventListener('click', function(e) { goPage('instructions'); });
+    document.getElementById('btn-start-main').addEventListener('click', function(e) { startMainSurvey(); });
+    document.getElementById('next-phase1').addEventListener('click', function(e) { goToPhase2(); });
+    document.getElementById('next-phase2').addEventListener('click', function(e) { nextScenario(); });
+    document.querySelectorAll('#mc3-group .radio-option').forEach(function(o) { o.addEventListener('click', function(e) { selectRadio('mc3', parseInt(this.getAttribute('data-value')), this); }); });
+    document.querySelectorAll('#mc4-group .radio-option').forEach(function(o) { o.addEventListener('click', function(e) { selectRadio('mc4', parseInt(this.getAttribute('data-value')), this); }); });
+    document.getElementById('btn-mc-next').addEventListener('click', function(e) { showSocialComparison(); });
+    document.getElementById('btn-sc-next').addEventListener('click', function(e) { showDemographics(); });
+    document.querySelectorAll('#invest-options .checkbox-container').forEach(function(b) { b.addEventListener('click', function(e) { toggleInvest(this.getAttribute('data-value'), this); }); });
+    document.getElementById('btn-submit').addEventListener('click', function(e) { submitSurvey(); });
+    document.getElementById('btn-download').addEventListener('click', function(e) { downloadData(); });
+}
+function initAllScales() { initScale('q1a-scale', 'q1a'); initScale('q1b-scale', 'q1b'); initChangeScale('q-change-scale'); ['q-deprivation','q-envy','q-superiority','q-relief','mc1-likert','mc2-likert','incom1','incom2','incom3','incom4','incom5','incom6','risk1','risk2'].forEach(function(id) { initLikert(id); }); }
+function initScale(cid, qk) { var c = document.getElementById(cid); if (!c) return; c.innerHTML = ''; for (var i = -5; i <= 5; i++) { var o = document.createElement('div'); o.className = 'scale-option'; o.setAttribute('data-value', i); o.innerHTML = '<div class="scale-circle">' + i + '</div>'; (function(v, el) { el.addEventListener('click', function(e) { selectScale(qk, v, el, cid); }); })(i, o); c.appendChild(o); } }
+function initChangeScale(cid) { var c = document.getElementById(cid); if (!c) return; c.innerHTML = ''; for (var i = -3; i <= 3; i++) { var o = document.createElement('div'); o.className = 'change-option'; o.setAttribute('data-value', i); o.innerHTML = '<div class="change-circle">' + (i > 0 ? '+' + i : i) + '</div>'; (function(v, el) { el.addEventListener('click', function(e) { selectChangeScale(v, el); }); })(i, o); c.appendChild(o); } }
+function initLikert(cid) { var c = document.getElementById(cid); if (!c) return; c.innerHTML = ''; for (var i = 1; i <= 7; i++) { var o = document.createElement('div'); o.className = 'likert-option'; o.setAttribute('data-value', i); o.innerHTML = '<div class="likert-radio"></div><div class="likert-number">' + i + '</div>'; (function(v, el) { el.addEventListener('click', function(e) { selectLikert(cid, v, el); }); })(i, o); c.appendChild(o); } }
+function selectScale(qk, v, el, cid) { document.querySelectorAll('#' + cid + ' .scale-option').forEach(function(o) { o.classList.remove('selected'); }); el.classList.add('selected'); if (qk === 'q1a') responses[currentScenario].q1a = v; else if (qk === 'q1b') responses[currentScenario].q1b = v; hideError(cid.replace('-scale', '-error')); }
+function selectChangeScale(v, el) { document.querySelectorAll('#q-change-scale .change-option').forEach(function(o) { o.classList.remove('selected'); }); el.classList.add('selected'); responses[currentScenario].satisfaction_change = v; hideError('q-change-error'); }
+function selectLikert(cid, v, el) { document.querySelectorAll('#' + cid + ' .likert-option').forEach(function(o) { o.classList.remove('selected'); }); el.classList.add('selected'); hideError(cid + '-error'); if (cid === 'q-deprivation') responses[currentScenario].deprivation = v; else if (cid === 'q-envy') responses[currentScenario].envy = v; else if (cid === 'q-superiority') responses[currentScenario].superiority = v; else if (cid === 'q-relief') responses[currentScenario].relief = v; else if (cid === 'mc1-likert') mcData.mc1 = v; else if (cid === 'mc2-likert') mcData.mc2 = v; else if (cid.indexOf('incom') === 0) incomData['i' + cid.slice(-1)] = v; else if (cid === 'risk1') riskData.r1 = v; else if (cid === 'risk2') riskData.r2 = v; }
+function selectRadio(g, v, el) { document.querySelectorAll('#' + g + '-group .radio-option').forEach(function(o) { o.classList.remove('selected'); }); el.classList.add('selected'); mcData[g] = v; hideError(g + '-error'); }
+function toggleCompare(t) { var el = document.getElementById('compare-' + t); el.classList.toggle('selected'); if (el.classList.contains('selected')) { if (compareTargets.indexOf(t) < 0) compareTargets.push(t); } else { compareTargets = compareTargets.filter(function(p) { return p !== t; }); } hideError('compare-error'); }
+function toggleConsent() { var el = document.getElementById('consent-check'); el.classList.toggle('selected'); document.getElementById('start-btn').disabled = !el.classList.contains('selected'); }
+function toggleInvest(t, el) { el.classList.toggle('selected'); if (el.classList.contains('selected')) { if (investProducts.indexOf(t) < 0) investProducts.push(t); if (t === 'none') { document.querySelectorAll('#invest-options .checkbox-container:not([data-value="none"])').forEach(function(o) { o.classList.remove('selected'); }); investProducts = ['none']; } else { var n = document.querySelector('#invest-options .checkbox-container[data-value="none"]'); if (n) n.classList.remove('selected'); investProducts = investProducts.filter(function(p) { return p !== 'none'; }); } } else { investProducts = investProducts.filter(function(p) { return p !== t; }); } hideError('invest-products-error'); }
+function showError(id) { var el = document.getElementById(id); if (el) el.classList.add('show'); }
+function hideError(id) { var el = document.getElementById(id); if (el) el.classList.remove('show'); }
+function goPage(pid) { ['intro','practice','instructions','main-phase1','main-phase2','manipulation-check','social-comparison','demographics','complete'].forEach(function(p) { document.getElementById(p).classList.add('hidden'); }); document.getElementById(pid).classList.remove('hidden'); window.scrollTo(0, 0); }
+function startSurvey() { if (compareTargets.length === 0) { showError('compare-error'); return; } goPage('practice'); }
+function startMainSurvey() { shuffledScenarios = shuffleArray(scenarios); responses = shuffledScenarios.map(function(s) { return { scenario_id: s.id, ri: s.ri, dr: s.dr, myReturn: s.myReturn, othersReturn: s.othersReturn, condition: s.condition, q1a: null, q1b: null, satisfaction_change: null, deprivation: null, envy: null, superiority: null, relief: null }; }); currentScenario = 0; goPage('main-phase1'); renderPhase1(); }
+function renderPhase1() { var s = shuffledScenarios[currentScenario]; document.getElementById('scenario-num-1').textContent = currentScenario + 1; document.getElementById('progress-text-1').textContent = (currentScenario + 1) + ' / ' + TOTAL_SCENARIOS; document.getElementById('progress-fill-1').style.width = ((currentScenario + 1) / TOTAL_SCENARIOS * 100) + '%'; renderChart('chart-phase1', s, false); document.querySelectorAll('#q1a-scale .scale-option').forEach(function(o) { o.classList.remove('selected'); }); hideError('q1a-error'); window.scrollTo(0, 0); }
+function renderPhase2() { var s = shuffledScenarios[currentScenario]; document.getElementById('scenario-num-2').textContent = currentScenario + 1; document.getElementById('progress-text-2').textContent = (currentScenario + 1) + ' / ' + TOTAL_SCENARIOS; document.getElementById('progress-fill-2').style.width = ((currentScenario + 1) / TOTAL_SCENARIOS * 100) + '%'; renderChart('chart-phase2', s, true); document.getElementById('change-question-box').classList.add('hidden'); document.getElementById('relative-loss-questions').classList.add('hidden'); document.getElementById('relative-gain-questions').classList.add('hidden'); document.getElementById('relief-questions').classList.add('hidden'); var qNum = 3; if (changePerceptionIds.indexOf(s.id) >= 0) { document.getElementById('change-question-box').classList.remove('hidden'); qNum++; } if (s.condition === 'relative_loss') { document.getElementById('relative-loss-questions').classList.remove('hidden'); document.getElementById('q-deprivation-text').textContent = 'Q' + qNum + '. Do you feel like you\'ve fallen behind compared to your acquaintances?'; qNum++; document.getElementById('q-envy-text').textContent = 'Q' + qNum + '. Do you feel envious of your acquaintances?'; } else if (s.condition === 'relative_gain') { document.getElementById('relative-gain-questions').classList.remove('hidden'); document.getElementById('q-superiority-text').textContent = 'Q' + qNum + '. Do you feel a sense of superiority compared to your acquaintances?'; qNum++; if (s.ri < 0) { document.getElementById('relief-questions').classList.remove('hidden'); document.getElementById('q-relief-text').textContent = 'Q' + qNum + '. Do you feel relieved that at least you didn\'t do worse than your acquaintances?'; } } else if (s.condition === 'equal' && s.ri < 0) { document.getElementById('relief-questions').classList.remove('hidden'); document.getElementById('q-relief-text').textContent = 'Q' + qNum + '. Do you feel relieved that at least you didn\'t do worse than your acquaintances?'; } ['#q1b-scale .scale-option','#q-change-scale .change-option','#q-deprivation .likert-option','#q-envy .likert-option','#q-superiority .likert-option','#q-relief .likert-option'].forEach(function(sel) { document.querySelectorAll(sel).forEach(function(o) { o.classList.remove('selected'); }); }); ['q1b-error','q-change-error','q-deprivation-error','q-envy-error','q-superiority-error','q-relief-error'].forEach(hideError); document.getElementById('next-phase2').textContent = currentScenario === TOTAL_SCENARIOS - 1 ? 'Complete' : 'Next'; window.scrollTo(0, 0); }
+function renderChart(cid, s, showOthers) { var chart = document.getElementById(cid); var scale = 2.2; function createBar(v) { var h = Math.abs(v) * scale; var isPos = v >= 0; var sign = v >= 0 ? '+' : ''; var cls = isPos ? 'positive' : 'negative'; var short = (!isPos && h < 35) ? ' short-bar' : ''; var top = isPos ? '<div class="bar ' + cls + '" style="height: ' + h + 'px;"><div class="bar-value">' + sign + v + '%</div></div>' : ''; var bot = !isPos ? '<div class="bar ' + cls + short + '" style="height: ' + h + 'px;"><div class="bar-value">' + v + '%</div></div>' : ''; return { top: top, bot: bot }; } var myBar = createBar(s.myReturn); var othersHTML = ''; if (showOthers) { var oBar = createBar(s.othersReturn); othersHTML = '<div class="bar-wrapper others visible"><div class="bar-area-top">' + oBar.top + '</div><div class="bar-area-bottom">' + oBar.bot + '</div><div class="bar-label">Acquaintances</div></div>'; } else { othersHTML = '<div class="bar-wrapper others"><div class="bar-area-top"></div><div class="bar-area-bottom"></div><div class="bar-label"></div></div>'; } chart.innerHTML = '<div class="chart-title">📈 Investment Returns Over the Past Year</div><div class="chart-area"><div class="chart-zero-label">0%</div><div class="chart-x-axis"></div><div class="chart-bars"><div class="bar-wrapper"><div class="bar-area-top">' + myBar.top + '</div><div class="bar-area-bottom">' + myBar.bot + '</div><div class="bar-label">Your Return</div></div>' + othersHTML + '</div></div><div class="chart-legend"><div class="legend-item"><div class="legend-box gain"></div>Gain</div><div class="legend-item"><div class="legend-box loss"></div>Loss</div></div>'; }
+function validatePhase1() { if (responses[currentScenario].q1a === null) { showError('q1a-error'); return false; } return true; }
+function validatePhase2() { var s = shuffledScenarios[currentScenario]; var valid = true; if (responses[currentScenario].q1b === null) { showError('q1b-error'); valid = false; } if (changePerceptionIds.indexOf(s.id) >= 0 && responses[currentScenario].satisfaction_change === null) { showError('q-change-error'); valid = false; } if (s.condition === 'relative_loss') { if (responses[currentScenario].deprivation === null) { showError('q-deprivation-error'); valid = false; } if (responses[currentScenario].envy === null) { showError('q-envy-error'); valid = false; } } else if (s.condition === 'relative_gain') { if (responses[currentScenario].superiority === null) { showError('q-superiority-error'); valid = false; } if (s.ri < 0 && responses[currentScenario].relief === null) { showError('q-relief-error'); valid = false; } } else if (s.condition === 'equal' && s.ri < 0) { if (responses[currentScenario].relief === null) { showError('q-relief-error'); valid = false; } } return valid; }
+function validateManipulationCheck() { var valid = true; if (mcData.mc1 === null) { showError('mc1-error'); valid = false; } if (mcData.mc2 === null) { showError('mc2-error'); valid = false; } if (mcData.mc3 === null) { showError('mc3-error'); valid = false; } if (mcData.mc4 === null) { showError('mc4-error'); valid = false; } return valid; }
+function validateSocialComparison() { var valid = true; for (var i = 1; i <= 6; i++) { if (!incomData['i' + i]) { showError('incom' + i + '-error'); valid = false; } } return valid; }
+function validateDemographics() { var valid = true; if (!document.getElementById('demo-gender').value) { showError('gender-error'); valid = false; } if (!document.getElementById('demo-age').value) { showError('age-error'); valid = false; } if (!document.getElementById('demo-invest-exp').value) { showError('invest-exp-error'); valid = false; } if (investProducts.length === 0) { showError('invest-products-error'); valid = false; } if (!document.getElementById('demo-community').value) { showError('community-error'); valid = false; } if (!riskData.r1) { showError('risk1-error'); valid = false; } if (!riskData.r2) { showError('risk2-error'); valid = false; } return valid; }
+function goToPhase2() { if (!validatePhase1()) return; goPage('main-phase2'); renderPhase2(); }
+function nextScenario() { if (!validatePhase2()) return; if (currentScenario < TOTAL_SCENARIOS - 1) { currentScenario++; goPage('main-phase1'); renderPhase1(); } else { goPage('manipulation-check'); } }
+function showSocialComparison() { if (!validateManipulationCheck()) return; goPage('social-comparison'); }
+function showDemographics() { if (!validateSocialComparison()) return; goPage('demographics'); }
+function submitSurvey() { if (!validateDemographics()) return; var pid = PROLIFIC_PID ? PROLIFIC_PID : 'P_' + Date.now(); var data = { timestamp: new Date().toISOString(), participant_id: pid, prolific_pid: PROLIFIC_PID || null, prolific_session_id: SESSION_ID || null, prolific_study_id: STUDY_ID || null, study: 'SVF_Study2_Block_' + BLOCK, block: BLOCK, compare_targets: compareTargets, responses: responses, manipulation_check: mcData, social_comparison_tendency: incomData, demographics: { gender: document.getElementById('demo-gender').value, age: document.getElementById('demo-age').value, invest_experience: document.getElementById('demo-invest-exp').value, invest_products: investProducts, community_usage: document.getElementById('demo-community').value, risk_seeking: riskData.r1, risk_preference: riskData.r2 } }; console.log('Survey Data:', data); localStorage.setItem('svf_study2_data_' + BLOCK, JSON.stringify(data)); if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') { fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(function() { console.log("Data sent"); }).catch(function(err) { console.error("Error", err); }); } document.getElementById('prolific-return-btn').href = 'https://app.prolific.com/submissions/complete?cc=' + PROLIFIC_COMPLETION_CODE; goPage('complete'); }
+function downloadData() { var data = localStorage.getItem('svf_study2_data_' + BLOCK); if (data) { var blob = new Blob([data], {type: 'application/json'}); var url = URL.createObjectURL(blob); var a = document.createElement('a'); a.href = url; a.download = 'svf_study2_' + BLOCK + '_' + Date.now() + '.json'; a.click(); URL.revokeObjectURL(url); } }
+</script>
+</body>
+</html>
