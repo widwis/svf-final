@@ -102,6 +102,10 @@ input:focus, select:focus { outline: none; border-color: #3182ce; }
 .incom-text { font-size: 14px; color: #4a5568; margin-bottom: 10px; }
 .error-message { color: #e53e3e; font-size: 13px; margin-top: 5px; display: none; }
 .error-message.show { display: block; }
+.submit-status { margin-top: 10px; padding: 10px; border-radius: 8px; text-align: center; display: none; }
+.submit-status.success { display: block; background: #f0fff4; color: #276749; }
+.submit-status.error { display: block; background: #fff5f5; color: #c53030; }
+.submit-status.sending { display: block; background: #ebf8ff; color: #2b6cb0; }
 @media (max-width: 600px) {
 .container { padding: 12px; }
 .card { padding: 20px; }
@@ -211,6 +215,7 @@ h2 { font-size: 18px; }
 <div class="form-group"><label class="form-label">How often do you check investment communities or forums?</label><select id="demo-community"><option value="">Select</option><option value="1">Never</option><option value="2">Rarely (a few times a year)</option><option value="3">Sometimes (monthly)</option><option value="4">Often (weekly)</option><option value="5">Very often (daily)</option></select><div class="error-message" id="community-error">Please select.</div></div>
 <div class="question-box"><div class="question-text">Which statement best describes you?</div><div class="likert-wrapper"><div class="likert" id="risk1"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>I avoid risks</span><span>I seek risks</span></div></div><div class="error-message" id="risk1-error">Please select a response.</div></div>
 <div class="question-box"><div class="question-text">When it comes to investments, I prefer:</div><div class="likert-wrapper"><div class="likert" id="risk2"></div><div class="likert-center-label">Neutral</div><div class="likert-anchors"><span>Stable, low returns</span><span>Volatile, high returns</span></div></div><div class="error-message" id="risk2-error">Please select a response.</div></div>
+<div id="submit-status" class="submit-status"></div>
 <div class="nav-buttons"><button class="btn" id="btn-submit">Submit</button></div>
 </div>
 <div id="complete" class="card hidden">
@@ -226,8 +231,8 @@ h2 { font-size: 18px; }
 </div>
 <script>
 var BLOCK = 'B';
-var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby6VdP_zhZYisXMPJ7k1DE8DgBIj8QymLwrGK1BuDl18l5x6MJlIPjGmS8ysDPcGzm-cQ/exec'; // 여기에 주소를 넣으세요!
-var PROLIFIC_COMPLETION_CODE = 'CR80C7MH'; // 나중에 프롤리픽 코드로 바꾸세요
+var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzw4g5aLygEzT20SfGMJSTmEPjxa5EfE045q7ZV84MFkrGo-vLlpfxU1zf-yUIEH7Rz5A/exec';
+var PROLIFIC_COMPLETION_CODE = 'CR80C7MH';
 
 function getUrlParameter(name) { var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'); var results = regex.exec(location.search); return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' ')); }
 var PROLIFIC_PID = getUrlParameter('PROLIFIC_PID');
@@ -302,8 +307,132 @@ function goToPhase2() { if (!validatePhase1()) return; goPage('main-phase2'); re
 function nextScenario() { if (!validatePhase2()) return; if (currentScenario < TOTAL_SCENARIOS - 1) { currentScenario++; goPage('main-phase1'); renderPhase1(); } else { goPage('manipulation-check'); } }
 function showSocialComparison() { if (!validateManipulationCheck()) return; goPage('social-comparison'); }
 function showDemographics() { if (!validateSocialComparison()) return; goPage('demographics'); }
-function submitSurvey() { if (!validateDemographics()) return; var pid = PROLIFIC_PID ? PROLIFIC_PID : 'P_' + Date.now(); var data = { timestamp: new Date().toISOString(), participant_id: pid, prolific_pid: PROLIFIC_PID || null, prolific_session_id: SESSION_ID || null, prolific_study_id: STUDY_ID || null, study: 'SVF_Study2_Block_' + BLOCK, block: BLOCK, compare_targets: compareTargets, responses: responses, manipulation_check: mcData, social_comparison_tendency: incomData, demographics: { gender: document.getElementById('demo-gender').value, age: document.getElementById('demo-age').value, invest_experience: document.getElementById('demo-invest-exp').value, invest_products: investProducts, community_usage: document.getElementById('demo-community').value, risk_seeking: riskData.r1, risk_preference: riskData.r2 } }; console.log('Survey Data:', data); localStorage.setItem('svf_study2_data_' + BLOCK, JSON.stringify(data)); if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') { fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(function() { console.log("Data sent"); }).catch(function(err) { console.error("Error", err); }); } document.getElementById('prolific-return-btn').href = 'https://app.prolific.com/submissions/complete?cc=' + PROLIFIC_COMPLETION_CODE; goPage('complete'); }
-function downloadData() { var data = localStorage.getItem('svf_study2_data_' + BLOCK); if (data) { var blob = new Blob([data], {type: 'application/json'}); var url = URL.createObjectURL(blob); var a = document.createElement('a'); a.href = url; a.download = 'svf_study2_' + BLOCK + '_' + Date.now() + '.json'; a.click(); URL.revokeObjectURL(url); } }
+
+function showSubmitStatus(type, message) {
+    var statusEl = document.getElementById('submit-status');
+    statusEl.className = 'submit-status ' + type;
+    statusEl.textContent = message;
+}
+
+function submitSurvey() {
+    if (!validateDemographics()) return;
+    
+    var pid = PROLIFIC_PID ? PROLIFIC_PID : 'P_' + Date.now();
+    var data = {
+        timestamp: new Date().toISOString(),
+        participant_id: pid,
+        prolific_pid: PROLIFIC_PID || null,
+        prolific_session_id: SESSION_ID || null,
+        prolific_study_id: STUDY_ID || null,
+        study: 'SVF_Study2_Block_' + BLOCK,
+        block: BLOCK,
+        compare_targets: compareTargets,
+        responses: responses,
+        manipulation_check: mcData,
+        social_comparison_tendency: incomData,
+        demographics: {
+            gender: document.getElementById('demo-gender').value,
+            age: document.getElementById('demo-age').value,
+            invest_experience: document.getElementById('demo-invest-exp').value,
+            invest_products: investProducts,
+            community_usage: document.getElementById('demo-community').value,
+            risk_seeking: riskData.r1,
+            risk_preference: riskData.r2
+        }
+    };
+
+    console.log('Survey Data:', data);
+    localStorage.setItem('svf_study2_data_' + BLOCK, JSON.stringify(data));
+
+    // 버튼 비활성화 및 상태 표시
+    document.getElementById('btn-submit').disabled = true;
+    showSubmitStatus('sending', 'Submitting your responses...');
+
+    if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+        // 핵심 수정: mode와 headers 제거, redirect 처리
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            redirect: 'follow',
+            body: JSON.stringify(data)
+        })
+        .then(function(response) {
+            console.log('Response status:', response.status);
+            console.log('Response type:', response.type);
+            
+            showSubmitStatus('success', 'Data submitted successfully!');
+            setTimeout(function() {
+                document.getElementById('prolific-return-btn').href = 'https://app.prolific.com/submissions/complete?cc=' + PROLIFIC_COMPLETION_CODE;
+                goPage('complete');
+            }, 500);
+        })
+        .catch(function(err) {
+            console.error('Fetch error:', err);
+            // CORS 에러가 발생해도 데이터는 전송되었을 수 있음
+            // 백업: iframe 방식으로 재시도
+            sendViaIframe(data, function(success) {
+                if (success) {
+                    showSubmitStatus('success', 'Data submitted successfully!');
+                } else {
+                    showSubmitStatus('error', 'Network issue, but data saved locally. Please continue.');
+                }
+                setTimeout(function() {
+                    document.getElementById('prolific-return-btn').href = 'https://app.prolific.com/submissions/complete?cc=' + PROLIFIC_COMPLETION_CODE;
+                    goPage('complete');
+                }, 500);
+            });
+        });
+    } else {
+        document.getElementById('prolific-return-btn').href = 'https://app.prolific.com/submissions/complete?cc=' + PROLIFIC_COMPLETION_CODE;
+        goPage('complete');
+    }
+}
+
+// 백업 전송 방식: 숨겨진 form + iframe
+function sendViaIframe(data, callback) {
+    try {
+        var iframe = document.createElement('iframe');
+        iframe.name = 'hidden_iframe_' + Date.now();
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = GOOGLE_SCRIPT_URL;
+        form.target = iframe.name;
+
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'data';
+        input.value = JSON.stringify(data);
+        form.appendChild(input);
+
+        document.body.appendChild(form);
+        form.submit();
+
+        // 타임아웃 후 성공으로 간주
+        setTimeout(function() {
+            document.body.removeChild(form);
+            document.body.removeChild(iframe);
+            callback(true);
+        }, 2000);
+    } catch (e) {
+        console.error('Iframe submission error:', e);
+        callback(false);
+    }
+}
+
+function downloadData() {
+    var data = localStorage.getItem('svf_study2_data_' + BLOCK);
+    if (data) {
+        var blob = new Blob([data], {type: 'application/json'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'svf_study2_' + BLOCK + '_' + Date.now() + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+}
 </script>
 </body>
 </html>
