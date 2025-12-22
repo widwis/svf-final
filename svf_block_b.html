@@ -225,13 +225,12 @@ h2 { font-size: 18px; }
 <p>Please click the button below to complete your submission and receive credit:</p>
 <div class="nav-buttons" style="justify-content: center; flex-direction: column; align-items: center; gap: 20px;">
 <a href="#" class="btn" id="prolific-return-btn">Complete & Return to Prolific</a>
-<button class="btn btn-secondary" id="btn-download">Download My Data (Optional)</button>
 </div>
 </div>
 </div>
 <script>
 var BLOCK = 'B';
-var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzw4g5aLygEzT20SfGMJSTmEPjxa5EfE045q7ZV84MFkrGo-vLlpfxU1zf-yUIEH7Rz5A/exec';
+var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYVqvFapBqfLKaCv4zI2DCqxY1Qfp1MTJoDfQKRq8Gq-rRiaPALwY356sivrOEj0XBLg/exec';
 var PROLIFIC_COMPLETION_CODE = 'CR80C7MH';
 
 function getUrlParameter(name) { var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'); var results = regex.exec(location.search); return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' ')); }
@@ -277,7 +276,6 @@ function bindAllEvents() {
     document.getElementById('btn-sc-next').addEventListener('click', function(e) { showDemographics(); });
     document.querySelectorAll('#invest-options .checkbox-container').forEach(function(b) { b.addEventListener('click', function(e) { toggleInvest(this.getAttribute('data-value'), this); }); });
     document.getElementById('btn-submit').addEventListener('click', function(e) { submitSurvey(); });
-    document.getElementById('btn-download').addEventListener('click', function(e) { downloadData(); });
 }
 function initAllScales() { initScale('q1a-scale', 'q1a'); initScale('q1b-scale', 'q1b'); initChangeScale('q-change-scale'); ['q-deprivation','q-envy','q-superiority','q-relief','mc1-likert','mc2-likert','incom1','incom2','incom3','incom4','incom5','incom6','risk1','risk2'].forEach(function(id) { initLikert(id); }); }
 function initScale(cid, qk) { var c = document.getElementById(cid); if (!c) return; c.innerHTML = ''; for (var i = -5; i <= 5; i++) { var o = document.createElement('div'); o.className = 'scale-option'; o.setAttribute('data-value', i); o.innerHTML = '<div class="scale-circle">' + i + '</div>'; (function(v, el) { el.addEventListener('click', function(e) { selectScale(qk, v, el, cid); }); })(i, o); c.appendChild(o); } }
@@ -418,19 +416,6 @@ function sendViaIframe(data, callback) {
     } catch (e) {
         console.error('Iframe submission error:', e);
         callback(false);
-    }
-}
-
-function downloadData() {
-    var data = localStorage.getItem('svf_study2_data_' + BLOCK);
-    if (data) {
-        var blob = new Blob([data], {type: 'application/json'});
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'svf_study2_' + BLOCK + '_' + Date.now() + '.json';
-        a.click();
-        URL.revokeObjectURL(url);
     }
 }
 </script>
