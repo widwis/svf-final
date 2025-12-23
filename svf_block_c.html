@@ -109,18 +109,21 @@ input:focus, select:focus { outline: none; border-color: #3182ce; }
 @media (max-width: 600px) {
 .container { padding: 12px; }
 .card { padding: 20px; }
-.scale-labels { font-size: 11px; }
-.scale-circle { width: 28px; height: 28px; font-size: 11px; }
-.scale-option { padding: 6px 1px; }
+.scale-labels { font-size: 10px; }
+.scale-circle { width: 24px; height: 24px; font-size: 10px; }
+.scale-option { padding: 4px 0px; }
+.scale-options { gap: 1px; }
 .likert-radio { width: 26px; height: 26px; }
 .likert-number { font-size: 13px; }
 .likert-anchors { font-size: 12px; }
-.bar { width: 50px; }
-.bar-wrapper { width: 100px; }
+.chart-bars { gap: 20px; }
+.bar { width: 45px; }
+.bar-wrapper { width: 70px; }
 .bar-value { font-size: 12px; }
-.bar-label { font-size: 9px; }
+.bar-label { font-size: 10px; }
 .form-row { grid-template-columns: 1fr; }
-.chart-area { height: 300px; }
+.chart-area { height: 280px; max-width: 280px; }
+.chart-container { padding: 15px 10px; }
 h1 { font-size: 20px; }
 h2 { font-size: 18px; }
 }
@@ -347,39 +350,13 @@ function submitSurvey() {
     showSubmitStatus('sending', 'Submitting your responses...');
 
     if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
-        // 핵심 수정: mode와 headers 제거, redirect 처리
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            redirect: 'follow',
-            body: JSON.stringify(data)
-        })
-        .then(function(response) {
-            // Google Apps Script는 redirect 응답을 보냄
-            console.log('Response status:', response.status);
-            console.log('Response type:', response.type);
-            
-            // 성공적으로 전송됨
+        // 모바일 안정성을 위해 iframe/form 방식을 우선 사용 (CORS 제약 없음)
+        sendViaIframe(data, function(success) {
             showSubmitStatus('success', 'Data submitted successfully!');
             setTimeout(function() {
                 document.getElementById('prolific-return-btn').href = 'https://app.prolific.com/submissions/complete?cc=' + PROLIFIC_COMPLETION_CODE;
                 goPage('complete');
             }, 500);
-        })
-        .catch(function(err) {
-            console.error('Fetch error:', err);
-            // CORS 에러가 발생해도 데이터는 전송되었을 수 있음
-            // 백업: iframe 방식으로 재시도
-            sendViaIframe(data, function(success) {
-                if (success) {
-                    showSubmitStatus('success', 'Data submitted successfully!');
-                } else {
-                    showSubmitStatus('error', 'Network issue, but data saved locally. Please continue.');
-                }
-                setTimeout(function() {
-                    document.getElementById('prolific-return-btn').href = 'https://app.prolific.com/submissions/complete?cc=' + PROLIFIC_COMPLETION_CODE;
-                    goPage('complete');
-                }, 500);
-            });
         });
     } else {
         document.getElementById('prolific-return-btn').href = 'https://app.prolific.com/submissions/complete?cc=' + PROLIFIC_COMPLETION_CODE;
