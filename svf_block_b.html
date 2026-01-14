@@ -263,7 +263,7 @@ var scenarios = [
 var changePerceptionIds = [2, 6, 24, 30];
 var TOTAL_SCENARIOS = 15;
 var shuffledScenarios = [], currentScenario = 0, responses = [];
-var mcData = {mc1:null, mc2:null, mc_risk:null, mc3:null, mc3-behavioral:null, mc4:null}, incomData = {}, riskData = {r1:null, r2:null};
+var mcData = {mc1:null, mc2:null, mc_risk:null, mc3:null, 'mc3-behavioral':null, mc4:null}, incomData = {}, riskData = {r1:null, r2:null};
 var investProducts = [], compareTargets = [];
 function shuffleArray(arr) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 document.addEventListener('DOMContentLoaded', function() { initAllScales(); bindAllEvents(); });
